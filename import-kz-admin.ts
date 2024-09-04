@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 const REACT_APP_REPO_URL: string =
-  'https://bitbucket.org/yourusername/your-react-app.git';
+  'https://github.com/alexchangi/kz-admin-public';
 
 // Set the destination path to the 'admin' folder inside the 'apps' folder within the current directory
 const DESTINATION_PATH: string = path.join(process.cwd(), 'apps', 'admin');
