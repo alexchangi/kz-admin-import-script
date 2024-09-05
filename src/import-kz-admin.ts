@@ -1,38 +1,41 @@
 #!/usr/bin/env node
 
-import { execSync } from 'child_process';
-import * as fs from 'fs';
-import * as path from 'path';
+const { execSync } = require('child_process');
+const fs = require('fs');
+const path = require('path');
 
-const REACT_APP_REPO_URL: string =
-  'https://github.com/alexchangi/kz-admin-public';
+// Use the current directory and create the path for the 'admin' folder
+const currentDir = process.cwd();
+const adminPath = path.join(currentDir, 'apps', 'admin');
 
-// Set the destination path to the 'admin' folder inside the 'apps' folder within the current directory
-const DESTINATION_PATH: string = path.join(process.cwd(), 'apps', 'admin');
-
-const cloneOrUpdateRepo = (): void => {
-  // Ensure the 'admin' directory exists within the 'apps' directory
-  if (!fs.existsSync(DESTINATION_PATH)) {
-    console.log(`Creating directory: ${DESTINATION_PATH}`);
-    fs.mkdirSync(DESTINATION_PATH, { recursive: true });
+// Function to create directory if it doesn't exist
+const createDirectory = (dir: string) => {
+  if (!fs.existsSync(dir)) {
+    console.log(`Creating directory: ${dir}`);
+    fs.mkdirSync(dir, { recursive: true });
   }
+};
 
-  if (fs.existsSync(path.join(DESTINATION_PATH, '.git'))) {
+// Function to clone or update the React app repository
+const cloneOrUpdateRepo = () => {
+  createDirectory(adminPath);
+
+  // Quote paths to handle spaces
+  const repoUrl = 'https://github.com/alexchangi/kz-admin-public';
+  const destinationPath = `"${adminPath}"`;
+
+  if (fs.existsSync(adminPath)) {
     console.log('Pulling the latest changes for the React app...');
-    execSync(`git -C ${DESTINATION_PATH} pull`, { stdio: 'inherit' });
+    execSync(`git -C ${destinationPath} pull`, { stdio: 'inherit' });
   } else {
     console.log('Cloning the React app repository...');
-    execSync(`git clone ${REACT_APP_REPO_URL} ${DESTINATION_PATH}`, {
-      stdio: 'inherit',
-    });
+    execSync(`git clone ${repoUrl} ${destinationPath}`, { stdio: 'inherit' });
   }
 
   console.log('Removing .git directory from the copied React app...');
-  execSync(`rm -rf ${DESTINATION_PATH}/.git`, { stdio: 'inherit' });
+  execSync(`rm -rf ${destinationPath}/.git`, { stdio: 'inherit' });
 
-  console.log(
-    "React app has been successfully imported into the 'apps/admin' directory."
-  );
+  console.log('React app has been successfully imported into the monorepo.');
 };
 
 cloneOrUpdateRepo();
